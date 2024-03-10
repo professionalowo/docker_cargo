@@ -1,4 +1,4 @@
-use crate::container::get_all_containers;
+use crate::container::{get_all_containers, Container};
 
 pub mod container;
 

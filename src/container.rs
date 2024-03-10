@@ -1,9 +1,7 @@
 pub mod socket;
+use std::ffi::OsStr;
 use std::io::ErrorKind;
 use std::{io::Error, process::Command};
-
-use self::socket::Socket;
-
 #[derive(Debug, Clone)]
 pub struct DockerError {
     pub kind: ErrorKind,
@@ -21,10 +19,7 @@ impl DockerError {
 
 impl From<Error> for DockerError {
     fn from(e: Error) -> Self {
-        DockerError {
-            kind: e.kind(),
-            message: e.to_string(),
-        }
+        DockerError::new(e.kind(), e.to_string())
     }
 }
 
@@ -44,7 +39,7 @@ pub struct ContainerData {
 #[derive(Debug, PartialEq, Clone)]
 pub enum ConatinerStatus {
     Created,
-    Running(Socket),
+    Running(String),
     Stopped,
     Paused,
     Restarting,
@@ -54,9 +49,9 @@ pub enum ConatinerStatus {
 }
 
 impl Container {
-    pub fn try_run<C: Into<String>>(
+    pub fn try_run<C: Into<String>, TIter: IntoIterator<Item = TItem>, TItem: AsRef<OsStr>>(
         image: C,
-        args: Option<Vec<String>>,
+        args: Option<TIter>,
     ) -> Result<(), DockerError> {
         let mut command = Command::new("docker");
         command.arg("run");
@@ -178,7 +173,6 @@ impl TryFrom<String> for Container {
     type Error = DockerError;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
-        // Implementation goes here
         let values: Vec<&str> = value.split(';').collect();
         if values.len() < 6 {
             return Err(DockerError::new(
@@ -196,10 +190,7 @@ impl TryFrom<String> for Container {
 
         let status = match values[5].split(' ').next().unwrap().to_lowercase().as_str() {
             "created" => ConatinerStatus::Created,
-            "running" | "up" => match Socket::try_from(values[6].to_string()) {
-                Ok(socket) => ConatinerStatus::Running(socket),
-                Err(e) => return Err(e),
-            },
+            "running" | "up" => ConatinerStatus::Running(values[6].into()),
             "stopped" => ConatinerStatus::Stopped,
             "paused" => ConatinerStatus::Paused,
             "restarting" => ConatinerStatus::Restarting,
@@ -224,7 +215,7 @@ pub fn get_all_containers() -> Result<Vec<Container>, Error> {
             "ps",
             "-a",
             "--format",
-            "{{.ID}};{{.Image}};{{.Command}};{{.CreatedAt}};{{.Names}};{{.Status}};{{.Ports}}",
+            "{{.ID}};{{.Image}};{{.Command}};{{.CreatedAt}};{{.Names}};{{.Status}};{{split .Ports \",\"}}",
         ])
         .output()?;
     let stdout = String::from_utf8_lossy(&output.stdout);
