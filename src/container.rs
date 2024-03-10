@@ -9,7 +9,7 @@ pub struct DockerError {
 }
 
 impl DockerError {
-    fn new<U: Into<String>>(kind: ErrorKind, message: U) -> Self {
+    fn new<M: Into<String>>(kind: ErrorKind, message: M) -> Self {
         DockerError {
             kind,
             message: message.into(),
