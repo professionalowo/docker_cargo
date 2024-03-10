@@ -2,6 +2,8 @@ pub mod socket;
 use std::ffi::OsStr;
 use std::io::ErrorKind;
 use std::{io::Error, process::Command};
+
+use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone)]
 pub struct DockerError {
     pub kind: ErrorKind,
@@ -23,12 +25,12 @@ impl From<Error> for DockerError {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone,Serialize,Deserialize)]
 pub struct Container {
     pub container: ContainerData,
     pub status: ConatinerStatus,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone,Serialize,Deserialize)]
 pub struct ContainerData {
     pub id: String,
     pub image: String,
@@ -36,7 +38,7 @@ pub struct ContainerData {
     pub created: String,
     pub name: String,
 }
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone,Serialize,Deserialize)]
 pub enum ConatinerStatus {
     Created,
     Running(String),
