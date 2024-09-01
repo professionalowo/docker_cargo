@@ -30,19 +30,19 @@ impl Into<String> for SocketMap {
 }
 #[cfg(test)]
 mod tests {
-    use crate::container::socket::Socket;
+    use crate::container::socket::{protocol::Protocol, Socket};
 
     use super::SocketMap;
 
     #[test]
     fn constructor_test() {
-        let map = SocketMap::new(20, Socket::new(455, Some("TCP".into())));
+        let map = SocketMap::new(20, Socket::new(455, Protocol::TCP));
         assert_eq!(map.outer_port, 20);
     }
 
     #[test]
     fn selfbind_test() {
-        let sock = SocketMap::self_bound(Socket::new(455, Some("TCP".into())));
+        let sock = SocketMap::self_bound(Socket::new(455, Protocol::TCP));
         assert_eq!(sock.inner_socket.port, sock.outer_port)
     }
 }
