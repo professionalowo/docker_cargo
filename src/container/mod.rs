@@ -1,6 +1,6 @@
-pub mod socket;
 pub mod builder;
 pub mod image;
+pub mod socket;
 use std::ffi::OsStr;
 use std::io::ErrorKind;
 use std::{io::Error, process::Command};
@@ -53,31 +53,6 @@ pub enum ConatinerStatus {
 }
 
 impl Container {
-    pub fn try_run<C: Into<String>, TIter: IntoIterator<Item = TItem>, TItem: AsRef<OsStr>>(
-        image: C,
-        args: Option<TIter>,
-    ) -> Result<(), DockerError> {
-        let mut command = Command::new("docker");
-        command.arg("run");
-        if let Some(args) = args {
-            command.args(args);
-        }
-        command.arg("-d");
-        command.arg(image.into());
-
-        let output = command
-            .output()
-            .map_err(|e| DockerError::new(e.kind(), e.to_string()))?;
-        if output.status.success() {
-            Ok(())
-        } else {
-            Err(DockerError::new(
-                std::io::ErrorKind::Other,
-                "Failed to start container",
-            ))
-        }
-    }
-
     pub fn try_start(&self) -> Result<(), DockerError> {
         if let ConatinerStatus::Running(_) = &self.status {
             return Ok(());
