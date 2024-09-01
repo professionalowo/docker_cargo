@@ -4,6 +4,5 @@ mod tests {
     use crate::container;
 
     #[test]
-    fn stream() {
-    }
+    fn stream() {}
 }

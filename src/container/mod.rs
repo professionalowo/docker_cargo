@@ -25,12 +25,12 @@ impl From<Error> for DockerError {
     }
 }
 
-#[derive(Debug, PartialEq, Clone,Serialize,Deserialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Container {
     pub container: ContainerData,
     pub status: ConatinerStatus,
 }
-#[derive(Debug, PartialEq, Clone,Serialize,Deserialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct ContainerData {
     pub id: String,
     pub image: String,
@@ -38,7 +38,7 @@ pub struct ContainerData {
     pub created: String,
     pub name: String,
 }
-#[derive(Debug, PartialEq, Clone,Serialize,Deserialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum ConatinerStatus {
     Created,
     Running(String),
@@ -222,8 +222,7 @@ pub fn get_all_containers() -> Result<Vec<Container>, Error> {
         .output()?;
     let stdout = String::from_utf8_lossy(&output.stdout);
     let containers: Vec<&str> = stdout.split('\n').collect();
-    let container_strings: Vec<String> = containers.iter().map(|&c| c.to_string()).collect();
-    let containers: Vec<Container> = container_strings
+    let containers: Vec<Container> = containers
         .iter()
         .filter_map(|c| Container::try_from(c.to_string()).ok())
         .collect();
