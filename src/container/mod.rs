@@ -1,7 +1,6 @@
 pub mod builder;
 pub mod image;
 pub mod socket;
-use std::ffi::OsStr;
 use std::io::ErrorKind;
 use std::{io::Error, process::Command};
 
