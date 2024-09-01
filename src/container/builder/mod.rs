@@ -93,6 +93,12 @@ impl ContainerCommandBuilder {
         command
     }
 }
+
+impl Default for ContainerCommandBuilder {
+    fn default() -> Self {
+        ContainerCommandBuilder::new()
+    }
+}
 #[cfg(test)]
 mod tests {
 
@@ -105,6 +111,8 @@ mod tests {
         let builder = ContainerCommandBuilder::new();
         assert_eq!(builder.image, None);
         assert!(builder.sockets == BoundSockets::Dynamic);
+        assert_eq!(builder.environment.len(), 0);
+        assert!(!builder.detatched);
     }
     #[test]
     fn image_test() {

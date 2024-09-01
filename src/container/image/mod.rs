@@ -1,4 +1,4 @@
-use std::ffi::{OsStr, OsString};
+use std::ffi::OsString;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Image {
