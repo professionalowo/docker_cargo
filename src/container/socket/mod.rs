@@ -1,18 +1,22 @@
-use std::io::ErrorKind;
-use serde::{Deserialize, Serialize};
 use super::DockerError;
+use serde::{Deserialize, Serialize};
+use std::io::ErrorKind;
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct Socket {
     pub port: u16,
-    pub protocol: String,
+    pub protocol: Option<String>,
 }
 
 impl Socket {
-    fn new<T: Into<u16>, U: Into<String>>(port: T, protocol: U) -> Self {
-        Socket {
-            port: port.into(),
-            protocol: protocol.into(),
+    pub fn new(port: u16, protocol: Option<String>) -> Self {
+        Socket { port, protocol }
+    }
+    pub fn format_protocol(&self) -> String {
+        if let Some(prot) = &self.protocol {
+            format!("{}/{}", self.port, prot)
+        } else {
+            format!("{}", self.port)
         }
     }
 }
@@ -41,6 +45,6 @@ impl TryFrom<String> for Socket {
             Ok(port) => port,
             Err(_) => return Err(DockerError::new(ErrorKind::InvalidInput, "Invalid port")),
         };
-        Ok(Socket::new(port, protocol))
+        Ok(Socket::new(port, Some(protocol.to_string())))
     }
 }
