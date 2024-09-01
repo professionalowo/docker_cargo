@@ -1,4 +1,5 @@
 pub mod socket;
+pub mod builder;
 use std::ffi::OsStr;
 use std::io::ErrorKind;
 use std::{io::Error, process::Command};
